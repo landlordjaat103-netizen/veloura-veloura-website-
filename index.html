@@ -7,10 +7,7 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <style>
-    .product-card { transition: all 0.4s ease; }
     .product-card:hover { transform: translateY(-12px); box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.25); }
-    .cart-sidebar { transform: translateX(100%); transition: all 0.4s ease; }
-    .cart-sidebar.open { transform: translateX(0); }
   </style>
 </head>
 <body class="bg-gray-50">
@@ -18,7 +15,7 @@
 <nav class="bg-white shadow-lg sticky top-0 z-50">
   <div class="max-w-6xl mx-auto px-6 py-5 flex justify-between items-center">
     <h1 class="text-4xl font-bold text-pink-600">Veloura</h1>
-    <div class="flex items-center gap-8 text-3xl">
+    <div class="flex gap-8 text-3xl">
       <div onclick="toggleCart()" class="relative cursor-pointer">
         <i class="fa-solid fa-shopping-cart"></i>
         <span id="cart-count" class="absolute -top-1 -right-1 bg-pink-600 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">0</span>
@@ -29,47 +26,8 @@
 </nav>
 
 <div class="max-w-6xl mx-auto px-6 py-12">
-  <h2 class="text-5xl font-bold text-center mb-12 text-gray-800">Our Elegant Collection</h2>
+  <h2 class="text-5xl font-bold text-center mb-12">Our Elegant Collection</h2>
   <div id="products-grid" class="grid grid-cols-2 md:grid-cols-3 gap-8"></div>
-</div>
-
-<!-- Cart Sidebar -->
-<div id="cart-sidebar" class="cart-sidebar fixed top-0 right-0 h-full w-96 bg-white shadow-2xl z-[100] overflow-auto">
-  <div class="p-6">
-    <div class="flex justify-between mb-6">
-      <h2 class="text-3xl font-bold">Your Cart</h2>
-      <button onclick="toggleCart()" class="text-4xl">✕</button>
-    </div>
-    <div id="cart-items" class="space-y-6 min-h-[400px]"></div>
-    <div class="mt-8 pt-6 border-t">
-      <div class="flex justify-between text-2xl font-bold mb-6">
-        <span>Total</span>
-        <span id="cart-total">₹0</span>
-      </div>
-      <button onclick="showCheckout()" class="w-full bg-pink-600 text-white py-5 rounded-3xl text-xl">Proceed to Checkout</button>
-    </div>
-  </div>
-</div>
-
-<!-- Checkout Modal (UPI + Screenshot) -->
-<div id="checkout-modal" class="hidden fixed inset-0 bg-black/70 z-[200] flex items-center justify-center">
-  <div class="bg-white rounded-3xl p-8 max-w-md w-full mx-4">
-    <h2 class="text-3xl font-bold mb-6">Checkout</h2>
-    <div id="checkout-content"></div>
-  </div>
-</div>
-
-<!-- Admin Panel -->
-<div id="admin-panel" class="hidden fixed inset-0 bg-gray-100 z-[300] overflow-auto">
-  <div class="max-w-4xl mx-auto p-8">
-    <div class="flex justify-between mb-8">
-      <h2 class="text-4xl font-bold">Admin Dashboard</h2>
-      <button onclick="hideAdmin()" class="text-4xl">✕</button>
-    </div>
-    <button onclick="addSampleProducts()" class="bg-green-600 text-white px-6 py-3 rounded-2xl mb-6">Add Sample Products</button>
-    <h3 class="text-2xl mb-4">Orders</h3>
-    <div id="admin-orders" class="space-y-4"></div>
-  </div>
 </div>
 
 <script>
@@ -81,7 +39,6 @@
   ];
 
   let cart = [];
-  let orders = [];
 
   function renderProducts() {
     document.getElementById("products-grid").innerHTML = products.map(p => `
@@ -89,121 +46,35 @@
         <img src="${p.image}" class="w-full h-72 object-cover">
         <div class="p-6">
           <h3 class="font-semibold text-xl">${p.name}</h3>
-          <p class="text-3xl font-bold text-pink-600 mt-2">₹${p.price}</p>
-          <button onclick="addToCart(${p.id})" class="mt-6 w-full bg-pink-600 hover:bg-pink-700 text-white py-4 rounded-2xl font-medium">Add to Cart</button>
+          <p class="text-3xl font-bold text-pink-600">₹${p.price}</p>
+          <button onclick="addToCart(${p.id})" class="mt-6 w-full bg-pink-600 text-white py-4 rounded-2xl">Add to Cart</button>
         </div>
       </div>
     `).join('');
   }
 
   function addToCart(id) {
-    const product = products.find(p => p.id === id);
-    cart.push({...product, qty: 1});
-    updateCartCount();
-  }
-
-  function updateCartCount() {
+    const p = products.find(x => x.id === id);
+    cart.push({...p, qty:1});
     document.getElementById("cart-count").textContent = cart.length;
+    alert(p.name + " added to cart 💖");
   }
 
   function toggleCart() {
-    document.getElementById("cart-sidebar").classList.toggle("open");
-    renderCart();
-  }
-
-  function renderCart() {
-    let html = '';
+    let msg = "🛍️ Cart Items:\n\n";
     let total = 0;
-    cart.forEach((item, i) => {
-      total += item.price * item.qty;
-      html += `
-        <div class="flex gap-4 border-b pb-6">
-          <img src="${item.image}" class="w-20 h-20 object-cover rounded-2xl">
-          <div class="flex-1">
-            <h4>${item.name}</h4>
-            <p class="text-pink-600">₹${item.price}</p>
-            <button onclick="removeFromCart(${i})" class="text-red-500 text-sm mt-2">Remove</button>
-          </div>
-        </div>`;
+    cart.forEach(item => {
+      msg += `\( {item.name} - ₹ \){item.price}\n`;
+      total += item.price;
     });
-    document.getElementById("cart-items").innerHTML = html || "<p class='text-center py-12 text-gray-400'>Cart is empty</p>";
-    document.getElementById("cart-total").textContent = `₹${total}`;
-  }
-
-  function removeFromCart(i) {
-    cart.splice(i, 1);
-    renderCart();
-    updateCartCount();
-  }
-
-  function showCheckout() {
-    if (cart.length === 0) return;
-    const total = cart.reduce((sum, item) => sum + item.price * item.qty, 0);
-    
-    document.getElementById("checkout-content").innerHTML = `
-      <div class="space-y-6">
-        <p class="text-4xl font-bold text-pink-600">₹${total}</p>
-        <div class="bg-gray-100 p-8 rounded-3xl text-center">
-          <p class="mb-4 font-medium">Scan kar ke Pay karo</p>
-          <img src="https://via.placeholder.com/280x280/ffe4e6/000?text=Veloura+UPI+QR" class="mx-auto rounded-2xl">
-          <p class="font-mono mt-4">veloura@upi</p>
-        </div>
-        <input type="file" id="screenshot" accept="image/*" class="w-full border p-4 rounded-2xl">
-        <button onclick="placeOrder()" class="w-full bg-green-600 text-white py-5 rounded-3xl text-xl">Submit Order</button>
-      </div>
-    `;
-    document.getElementById("checkout-modal").classList.remove("hidden");
-  }
-
-  function placeOrder() {
-    const screenshot = document.getElementById("screenshot");
-    if (!screenshot.files[0]) return alert("Payment Screenshot upload karna zaroori hai!");
-
-    const total = cart.reduce((sum, item) => sum + item.price * item.qty, 0);
-    orders.push({
-      id: Date.now(),
-      items: [...cart],
-      total: total,
-      date: new Date().toLocaleString(),
-      status: "Payment Pending"
-    });
-
-    alert("✅ Order Placed Successfully!\nAdmin payment verify kar lenge.");
-    cart = [];
-    toggleCart();
-    document.getElementById("checkout-modal").classList.add("hidden");
-    updateCartCount();
+    msg += `\nTotal: ₹${total}`;
+    alert(msg || "Cart empty hai");
   }
 
   function showAdmin() {
-    document.getElementById("admin-panel").classList.remove("hidden");
-    let html = orders.map(o => `
-      <div class="bg-white p-6 rounded-3xl">
-        <p class="font-bold">Order #${o.id}</p>
-        <p>Total: ₹${o.total}</p>
-        <p>Status: ${o.status}</p>
-        \( {o.status === "Payment Pending" ? `<button onclick="verifyPayment( \){o.id})" class="mt-4 bg-green-600 text-white px-6 py-3 rounded-2xl">Verify Payment</button>` : ''}
-      </div>
-    `).join('');
-    document.getElementById("admin-orders").innerHTML = html || "<p>No orders yet</p>";
+    alert("👑 Admin Panel\nProducts add karne ke liye GitHub se code update karo");
   }
 
-  function verifyPayment(id) {
-    const order = orders.find(o => o.id === id);
-    if (order) order.status = "Confirmed";
-    showAdmin();
-    alert("Payment Verified!");
-  }
-
-  function hideAdmin() {
-    document.getElementById("admin-panel").classList.add("hidden");
-  }
-
-  function addSampleProducts() {
-    alert("Sample products already loaded!");
-  }
-
-  // Start
   renderProducts();
 </script>
 </body>
