@@ -5,30 +5,87 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Veloura - Fashion for Her</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    .product-card:hover { transform: translateY(-10px); transition: all 0.3s; }
+  </style>
 </head>
-<body class="bg-pink-50 min-h-screen">
-  <div class="max-w-4xl mx-auto p-6 text-center">
-    <h1 class="text-6xl font-bold text-pink-600 mb-4">Veloura</h1>
-    <p class="text-2xl mb-10">Premium Fashion for Modern Women</p>
-    
-    <div class="grid grid-cols-2 gap-6">
-      <div class="bg-white rounded-3xl overflow-hidden shadow">
-        <img src="https://picsum.photos/id/1015/600/800" class="w-full h-80 object-cover">
-        <div class="p-4">
-          <h3 class="font-semibold">Pink Maxi Dress</h3>
-          <p class="text-pink-600 text-xl">₹3299</p>
-        </div>
-      </div>
-      <div class="bg-white rounded-3xl overflow-hidden shadow">
-        <img src="https://picsum.photos/id/1027/600/800" class="w-full h-80 object-cover">
-        <div class="p-4">
-          <h3 class="font-semibold">Silk Blouse</h3>
-          <p class="text-pink-600 text-xl">₹1899</p>
-        </div>
-      </div>
-    </div>
+<body class="bg-gray-50">
 
-    <p class="mt-12 text-gray-600">Website Live Ho Gayi Hai ✅<br>Full Features (Cart, Admin, Payment) jaldi add karenge.</p>
+<nav class="bg-white shadow-md sticky top-0 z-50 p-4">
+  <div class="max-w-6xl mx-auto flex justify-between items-center">
+    <h1 class="text-4xl font-bold text-pink-600">Veloura</h1>
+    <div class="flex gap-6 text-3xl">
+      <i onclick="toggleCart()" class="fa-shopping-cart cursor-pointer relative">
+        <span id="cart-count" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center text-[10px]">0</span>
+      </i>
+      <i onclick="showAdmin()" class="fa-user-shield cursor-pointer"></i>
+    </div>
   </div>
+</nav>
+
+<div class="max-w-6xl mx-auto p-6">
+  <h2 class="text-4xl font-bold text-center mb-10 text-pink-700">Our Collection</h2>
+  <div id="products-grid" class="grid grid-cols-2 md:grid-cols-3 gap-6"></div>
+</div>
+
+<script>
+  const products = [
+    {id:1, name:"Blush Pink Maxi Dress", price:3299, image:"https://picsum.photos/id/1015/600/800"},
+    {id:2, name:"Cream Silk Blouse", price:1899, image:"https://picsum.photos/id/1027/600/800"},
+    {id:3, name:"High Waist Wide Pants", price:2499, image:"https://picsum.photos/id/106/600/800"},
+    {id:4, name:"Pearl Hoop Earrings", price:899, image:"https://picsum.photos/id/201/600/800"}
+  ];
+
+  let cart = [];
+
+  function renderProducts() {
+    document.getElementById("products-grid").innerHTML = products.map(p => `
+      <div class="product-card bg-white rounded-3xl overflow-hidden shadow-lg">
+        <img src="${p.image}" class="w-full h-64 object-cover">
+        <div class="p-5">
+          <h3 class="font-semibold text-lg">${p.name}</h3>
+          <p class="text-3xl font-bold text-pink-600 mt-2">₹${p.price}</p>
+          <button onclick="addToCart(${p.id})" class="mt-5 w-full bg-pink-600 hover:bg-pink-700 text-white py-4 rounded-2xl text-lg">Add to Cart</button>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function addToCart(id) {
+    const product = products.find(p => p.id === id);
+    cart.push({...product, qty: 1});
+    updateCartCount();
+    alert(`${product.name} added to cart 💖`);
+  }
+
+  function updateCartCount() {
+    document.getElementById("cart-count").textContent = cart.length;
+  }
+
+  function toggleCart() {
+    if (cart.length === 0) {
+      alert("Cart empty hai!");
+      return;
+    }
+    let text = "🛍️ Your Cart:\n\n";
+    let total = 0;
+    cart.forEach(item => {
+      text += `\( {item.name} - ₹ \){item.price}\n`;
+      total += item.price;
+    });
+    text += `\nTotal: ₹${total}`;
+    if (confirm(text + "\n\nProceed to Checkout?")) {
+      alert("✅ Checkout page jaldi aa rahi hai!\nUPI Payment + Screenshot feature add kar rahe hain.");
+    }
+  }
+
+  function showAdmin() {
+    alert("👑 Admin Panel\n\n• Products manage karne ke liye GitHub se code update karo\n• Orders yahan aayenge jaldi");
+  }
+
+  // Initialize
+  renderProducts();
+</script>
 </body>
 </html>
