@@ -34,19 +34,19 @@
 </div>
 
 <!-- Cart Sidebar -->
-<div id="cart-sidebar" class="cart-sidebar fixed top-0 right-0 h-full w-96 bg-white shadow-2xl z-50 overflow-auto">
+<div id="cart-sidebar" class="cart-sidebar fixed top-0 right-0 h-full w-96 bg-white shadow-2xl z-[100] overflow-auto">
   <div class="p-6">
     <div class="flex justify-between items-center mb-6">
       <h2 class="text-3xl font-bold">Your Cart</h2>
-      <button onclick="toggleCart()" class="text-4xl">✕</button>
+      <button onclick="toggleCart()" class="text-4xl leading-none">✕</button>
     </div>
-    <div id="cart-items" class="space-y-6"></div>
-    <div class="mt-8 pt-6 border-t">
-      <div class="flex justify-between text-2xl font-bold">
+    <div id="cart-items" class="min-h-[300px]"></div>
+    <div class="mt-8 pt-6 border-t border-gray-200">
+      <div class="flex justify-between text-2xl font-bold mb-6">
         <span>Total</span>
         <span id="cart-total">₹0</span>
       </div>
-      <button onclick="checkout()" class="w-full mt-6 bg-pink-600 text-white py-5 rounded-2xl text-xl">Proceed to Checkout</button>
+      <button onclick="checkout()" class="w-full bg-pink-600 hover:bg-pink-700 text-white py-5 rounded-3xl text-xl font-medium">Proceed to Checkout</button>
     </div>
   </div>
 </div>
@@ -78,7 +78,7 @@
     const product = products.find(p => p.id === id);
     cart.push({...product, qty: 1});
     updateCartCount();
-    alert(`${product.name} added to cart 💖`);
+    // Removed old alert
   }
 
   function updateCartCount() {
@@ -86,48 +86,44 @@
   }
 
   function toggleCart() {
-    const sidebar = document.getElementById("cart-sidebar");
-    sidebar.classList.toggle("open");
+    document.getElementById("cart-sidebar").classList.toggle("open");
     renderCart();
   }
 
   function renderCart() {
     let html = '';
     let total = 0;
-    cart.forEach((item, index) => {
+    cart.forEach((item, i) => {
       total += item.price * item.qty;
       html += `
-        <div class="flex gap-4 border-b pb-4">
-          <img src="${item.image}" class="w-20 h-20 object-cover rounded-2xl">
-          <div class="flex-1">
+        <div class="flex gap-4 pb-6 border-b">
+          <img src="${item.image}" class="w-20 h-20 object-cover rounded-xl">
+          <div>
             <h4 class="font-medium">${item.name}</h4>
             <p class="text-pink-600">₹${item.price}</p>
-            <button onclick="removeFromCart(${index})" class="text-red-500 text-sm mt-2">Remove</button>
+            <button onclick="removeFromCart(${i})" class="text-red-500 text-sm mt-2">Remove</button>
           </div>
         </div>`;
     });
-    document.getElementById("cart-items").innerHTML = html || "<p class='text-center py-12 text-gray-400'>Cart is empty</p>";
+    document.getElementById("cart-items").innerHTML = html || `<p class="text-center py-20 text-gray-400">Your cart is empty</p>`;
     document.getElementById("cart-total").textContent = `₹${total}`;
   }
 
-  function removeFromCart(index) {
-    cart.splice(index, 1);
+  function removeFromCart(i) {
+    cart.splice(i, 1);
     renderCart();
     updateCartCount();
   }
 
   function checkout() {
     if (cart.length === 0) return;
-    const total = cart.reduce((sum, item) => sum + item.price * item.qty, 0);
-    alert(`Total Amount: ₹${total}\n\nUPI Payment + Screenshot feature next update mein aa jayega!`);
-    // Yahan baad mein full checkout modal add karenge
+    alert("Checkout page aa rahi hai jaldi!\nUPI + Screenshot feature next update mein.");
   }
 
   function showAdmin() {
-    alert("👑 Admin Panel\n\nProducts manage karne ke liye GitHub se code update kar sakte ho.");
+    alert("Admin Panel - GitHub se products update kar sakte ho.");
   }
 
-  // Initialize
   renderProducts();
 </script>
 </body>
